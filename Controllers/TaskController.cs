@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using test.Services;
 using Test.Data;
 using Test.Models;
 
@@ -10,10 +11,11 @@ namespace test.Controllers
     public class TaskController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ITaskService _taskService;
 
-        public TaskController(AppDbContext context)
+        public TaskController(ITaskService taskService)
         {
-            _context = context;
+            _taskService = taskService;
         }
 
         [HttpGet("/test")]
@@ -21,6 +23,28 @@ namespace test.Controllers
         {
             return "API is working!";
         }
+
+        [HttpGet("/getAll")]
+        public async Task<List<TaskItem>> getAll()
+        {
+            return await _taskService.GetAll();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TaskItem>> GetOne(int id)
+        {
+            var task = await _taskService.GetTaskById(id);
+            if (task == null) return NotFound();
+            return task;
+        }
+
+        [HttpPost("/create")]
+        public async Task<IActionResult> Create(TaskItem task)
+        {
+            var created = await _taskService.CreateTask(task);
+            return CreatedAtAction(nameof(GetOne), new { id = created.Id }, created);
+        }
+
 
         /*
         [HttpGet]
