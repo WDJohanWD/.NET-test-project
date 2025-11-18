@@ -4,9 +4,10 @@ using Test.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de EF Core con SQLite
+// Configuración de EF Core con SQL Server
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=test.db"));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddControllers();
 
